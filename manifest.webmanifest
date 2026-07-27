@@ -1,0 +1,9 @@
+{
+  "name": "현장답사 쉐어링 : 이사진 어디야?",
+  "short_name": "이사진 어디야?",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f8fb",
+  "theme_color": "#2563eb",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
