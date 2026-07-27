@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>사진 지도</title>
+  <meta name="theme-color" content="#2563eb" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -82,6 +87,7 @@
     async function savePhoto() { const files=[...fileInput.files]; if(!files.length){alert('저장할 사진 파일을 선택해주세요.');return;} if(state.pendingLocations.some(x=>!x)&&!state.selectedLocation){alert('GPS 위치가 없는 사진이 있습니다. 창을 닫고 지도에서 공통 위치를 클릭한 뒤 다시 시도해주세요.');return;} const button=$('#savePhoto'); button.disabled=true;button.textContent=`${files.length}장 저장 중…`; try { const commonTitle=titleInput.value.trim(); const photos=files.map((f,index)=>{const location=state.pendingLocations[index]||state.selectedLocation;return {id:crypto.randomUUID(),title:commonTitle?(files.length===1?commonTitle:`${commonTitle} ${index+1}`):f.name,originalName:f.name,file:f,lat:location.lat,lng:location.lng,createdAt:Date.now()};}); const saved=[];for(const p of photos)saved.push(await uploadPhoto(p));state.photos.push(...saved);render();map.flyTo([saved[0].lat,saved[0].lng],14);dialog.close();$('#uploadForm').reset();state.pendingLocations=[];state.selectedLocation=null;updateCoords(); } catch(error) { console.error(error);alert('사진을 저장하지 못했습니다. Supabase 설정 SQL을 먼저 실행했는지 확인해주세요.'); } finally {button.disabled=false;button.textContent='사진 저장';} }
     $('#savePhoto').onclick=savePhoto; $('#uploadForm').onsubmit=e=>{e.preventDefault();savePhoto();};
     (async()=>{try{state.photos=await store('readonly');state.zones=await loadZones();if(!state.photos.length){const legacy=await readLegacyPhotos();for(const photo of legacy){try{state.photos.push(await uploadPhoto(photo));}catch(error){console.warn(error);}}}render();}catch(error){console.error(error);alert('공유 저장소를 준비 중입니다. supabase-setup.sql을 Supabase SQL Editor에서 실행해주세요.');}})();
+    if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(console.warn);
   </script>
 </body>
 </html>
